@@ -100,7 +100,7 @@ async def main():
     # url = f'https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&pub_start_date={formatted_month}%2F{formatted_day}%2F{formatted_year}&pub_end_date={formatted_month}%2F{formatted_day}%2F{formatted_year}'
     url = f'https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&pub_start_date=08%2F21%2F2024&pub_end_date=08%2F22%2F2024'
     csv_file = 'cve_data.csv'
-    fieldnames = ['Unique ID','Product Name', 'OEM Name','Description', 'Severity level','Published Date'] 
+    fieldnames = ['Unique ID','Product Name', 'OEM Name','Description','Security Score', 'Severity Level','Published Date'] 
     new_vul = []
     # Check if the file exists, if not, write the header row
     cve_ids_in_file = set()
@@ -141,46 +141,48 @@ async def main():
                         description_element = soup1.find('p', {'data-testid': 'vuln-description'})
                         description = description_element.get_text(strip=True)
 
-                        severity = ""
+                        # severity = ""
                         severity_element = soup1.find('a', {'data-testid': 'vuln-cvss3-cna-panel-score'})
                         severity_vuln = severity_element
+                        severity_score = None
+                        severity_level = ""
                         try:
-                            # print(severity)
+                         if severity_element:
+                            severity_vuln = severity_element.get_text(strip=True)
                             match = re.match(r"(\d+\.\d+)\s+(\w+)", severity_vuln)
                             if match:
                                 severity_score = match.group(1)
                                 severity_level = match.group(2)
-                                severity = f"{severity_score} {severity_level}"
+                                # severity = f"{severity_score} {severity_level}"
                         except:
                             print("N/A")
-                            # return None
-                        
                         
                         publish_element = soup1.find('span', {'data-testid': 'vuln-published-on'})
-                        published = publish_element.get_text(strip=True)
+                        published = publish_element.get_text(strip=True) if publish_element else "N/A"
                         # Write to CSV
                         with open(csv_file, 'a', newline='') as file:
                             writer = csv.DictWriter(file, fieldnames=fieldnames)
-                            writer.writerow({
+                            writer.writerow({ 
                                     'Unique ID': cve_id,
                                     'Product Name': source,
                                     'OEM Name':source,
                                     'Description': description,
-                                    'Severity level': severity,
+                                    'Security Score':severity_score,
+                                    'Severity Level': severity_level,
                                     'Published Date': published
                             })
-                        new_vul.append(f"{cve_id}: {source} - {description} (Severity: {severity}, Published: {published})")
+                        new_vul.append(f"{cve_id}:{source}\nDescription :{description} \nSecurity_score: {severity_score} \nSeverity_level: {severity_level} \nPublished: {published} \n\n)")
                     except AttributeError as e:
                         print("Error extracting description:", e)
         if new_vul:
-            sender_email = "ctfkattabomman@gmail.com"
-            sender_password =  "bkyo kule yujw vlfm"   # Use an app password
-            recipient_email = "ctfkattabomman@gmail.com"
+            sender_email = "YOUR_EMAIL"
+            sender_password =  "YOUR_APP_PASSWORD"   # Use an app password
+            recipient_email = "YOUR_EMAIL"
             subject = "Newly Found Vulnerability Information"
             body = "\n".join(new_vul)
 
             send_email(sender_email, sender_password, recipient_email, subject, body)
-        else:print("No vulnerabilities found to send in the email.")
+        else: pass
     # Send email with vulnerability information
   
 # Run the main function
