@@ -97,8 +97,8 @@ async def main():
     formatted_month = quote(month)
     formatted_day = quote(day)
     formatted_year = year
-    # url = f'https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&pub_start_date={formatted_month}%2F{formatted_day}%2F{formatted_year}&pub_end_date={formatted_month}%2F{formatted_day}%2F{formatted_year}'
-    url = f'https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&pub_start_date=08%2F21%2F2024&pub_end_date=08%2F22%2F2024'
+    url = f'https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&pub_start_date={formatted_month}%2F{formatted_day}%2F{formatted_year}&pub_end_date={formatted_month}%2F{formatted_day}%2F{formatted_year}'
+    #url = f'https://nvd.nist.gov/vuln/search/results?form_type=Advanced&results_type=overview&search_type=all&isCpeNameSearch=false&pub_start_date=08%2F21%2F2024&pub_end_date=08%2F22%2F2024'
     csv_file = 'cve_data.csv'
     fieldnames = ['Unique ID','Product Name', 'OEM Name','Description','Security Score', 'Severity Level','Published Date'] 
     new_vul = []
@@ -171,7 +171,7 @@ async def main():
                                     'Severity Level': severity_level,
                                     'Published Date': published
                             })
-                        new_vul.append(f"{cve_id}:{source}\nDescription :{description} \nSecurity_score: {severity_score} \nSeverity_level: {severity_level} \nPublished: {published} \n\n)")
+                        new_vul.append(f"{cve_id}:{source}\nDescription :{description} \nSecurity_score: {severity_score} \nSeverity_level: {severity_level} \nPublished: {published} \n\n")
                     except AttributeError as e:
                         print("Error extracting description:", e)
         if new_vul:
